@@ -8,24 +8,26 @@ A self-hosted family communication system designed for elderly relatives. Send p
 ┌─────────────────────────────────────────────┐
 │               Docker Server                  │
 │  Node.js · Express · Socket.io · SQLite      │
+│  JWT Auth · Rate Limiting · Helmet CSP       │
 └────────────┬──────────────────┬──────────────┘
-             │                  │
+             │  JWT (30 days)   │  JWT (7 days)
     ┌────────▼───────┐  ┌───────▼────────┐
     │    OmaGUI      │  │    PostGUI     │
     │  (yourdomain/) │  │  (/post)       │
     │                │  │                │
+    │  PIN login     │  │  Password      │
     │  Clock & Date  │  │  Upload photos │
     │  Photo display │  │  Send messages │
     │  Chat messages │  │  See reactions │
     │  Mood buttons  │  │  Call Oma      │
     │  Video call    │  │                │
-    │  Morning       │  │  Password      │
-    │  greeting      │  │  protected     │
+    │  Morning       │  │                │
+    │  greeting      │  │                │
     └────────────────┘  └────────────────┘
 ```
 
-- **OmaGUI** — full-screen, large-font display for Oma. Runs in the browser on her device (tablet, TV stick, PC).
-- **PostGUI** — interface for family members to send photos, messages and make calls.
+- **OmaGUI** — full-screen, large-font display for Oma. Runs in the browser on her device (tablet, TV stick, PC). Protected by a numeric PIN.
+- **PostGUI** — interface for family members to send photos, messages and make calls. Protected by password.
 - **Morning greeting** — every day at 08:00 the server sends a "Guten Morgen, Oma Sigrid!" overlay to OmaGUI automatically.
 - **Video calls** — powered by [Jitsi Meet](https://meet.jit.si) (free, no account needed). Both sides join the same room.
 
@@ -54,8 +56,12 @@ cd omasys
 domain: oma.yourdomain.de   # your domain or server IP
 port: 3000                  # port used when running without Caddy
 password: changeme          # PostGUI login password for family
+oma_pin: 1234               # PIN for OmaGUI (numeric, 4–8 digits)
+jwt_secret: change-me       # long random secret for JWT signing — CHANGE THIS
 caddy: false                # set to true to enable HTTPS via Caddy
 ```
+
+> **Important:** Change `jwt_secret` to a long random string before going live. If it stays as the default, anyone can forge tokens.
 
 ### 3. Start
 
@@ -82,8 +88,11 @@ Or with command line overrides:
 
 Open this in Oma's browser. Best used in fullscreen mode (`F11`).
 
+On first visit, Oma enters her PIN on a large numpad. The browser remembers her for 30 days — she won't need to enter it again unless she clears her browser data.
+
 | Element | Description |
 |---|---|
+| PIN screen | Large numpad on first visit, auto-submits after 4 digits |
 | Clock | Current time and date in German |
 | Photo display | Shows photos sent by family, auto-advances every 8 seconds |
 | Chat | Messages from family. Oma can type replies. |
@@ -93,7 +102,7 @@ Open this in Oma's browser. Best used in fullscreen mode (`F11`).
 
 ### PostGUI — `https://yourdomain.de/post`
 
-Login with the password set in `config.yml`.
+Login with the password from `config.yml`. The browser remembers the session for 7 days.
 
 | Feature | Description |
 |---|---|
@@ -102,6 +111,31 @@ Login with the password set in `config.yml`.
 | History | Full conversation history between family and Oma. |
 | Oma's mood | Latest mood reactions from Oma with timestamps. |
 | Oma anrufen | Sends Oma a call notification and opens Jitsi video call. |
+
+---
+
+## Security
+
+Both interfaces are protected with JWT tokens issued by the server.
+
+| | Method | Token lifetime |
+|---|---|---|
+| OmaGUI | 4–8 digit PIN | 30 days |
+| PostGUI | Password | 7 days |
+
+**What is protected:**
+- All API endpoints require a valid JWT (except `/api/status` used by the Docker healthcheck)
+- Socket.io connections require a valid JWT in the handshake
+- Oma's role cannot access family-only endpoints (posting photos, sending messages as Familie)
+- Rate limiting: 10 login attempts per 15 minutes per IP; 50 uploads and 100 messages per hour
+- Security headers via Helmet (including Content Security Policy)
+
+**Before going live, change these in `config.yml`:**
+```yaml
+password: your-strong-password
+oma_pin: 5678
+jwt_secret: some-very-long-random-string-nobody-can-guess
+```
 
 ---
 
@@ -154,4 +188,6 @@ git pull
 | `domain` | `yourdomain.de` | Hostname for URLs and Caddy certificate |
 | `port` | `3000` | Exposed port when running without Caddy |
 | `password` | `changeme` | PostGUI login password |
+| `oma_pin` | `1234` | OmaGUI PIN (numeric) |
+| `jwt_secret` | *(weak default)* | Secret for signing JWT tokens — **must be changed** |
 | `caddy` | `false` | Enable Caddy reverse proxy with automatic HTTPS |
