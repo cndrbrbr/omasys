@@ -1,0 +1,16 @@
+# OmaSys Konfiguration
+
+# Hostname / Domain (z.B. oma.meinedomain.de)
+domain: yourdomain.de
+
+# Port für direkten Zugriff (ohne Caddy)
+port: 3000
+
+# Passwort für das PostGUI (Familie)
+password: changeme
+
+# Caddy HTTPS-Proxy aktivieren? (true/false)
+# Kann auch per Kommandozeile überschrieben werden:
+#   ./start.sh --caddy      (erzwingt Caddy)
+#   ./start.sh --no-caddy   (erzwingt kein Caddy)
+caddy: false

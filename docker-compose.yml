@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  caddy:
+    profiles: [caddy]
+    image: caddy:2-alpine
+    container_name: omasys-caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN=${DOMAIN:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - omasys
+    restart: unless-stopped
+
+  omasys:
+    build: .
+    container_name: omasys
+    ports:
+      - "${PORT:-3000}:3000"
+    volumes:
+      - omasys_data:/data
+    environment:
+      - PORT=3000
+      - POST_PASSWORD=${POST_PASSWORD:-changeme}
+      - DATA_DIR=/data
+    restart: unless-stopped
+
+volumes:
+  omasys_data:
+    driver: local
+  caddy_data:
+    driver: local
+  caddy_config:
+    driver: local
