@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-export default function MessageInput({ password }) {
+export default function MessageInput({ token }) {
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
@@ -13,7 +13,7 @@ export default function MessageInput({ password }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-password': password
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({ text: text.trim(), sender: 'Familie' })
       })

@@ -5,7 +5,7 @@ function formatTime(str) {
   return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
 }
 
-export default function Chat({ messages, socket }) {
+export default function Chat({ messages, token }) {
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
   const bottomRef = useRef(null)
@@ -21,7 +21,7 @@ export default function Chat({ messages, socket }) {
     try {
       await fetch('/api/messages/oma', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ text })
       })
       setInput('')

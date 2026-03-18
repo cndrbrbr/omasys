@@ -28,6 +28,8 @@ services:
     environment:
       - PORT=3000
       - POST_PASSWORD=${POST_PASSWORD:-changeme}
+      - OMA_PIN=${OMA_PIN:-1234}
+      - JWT_SECRET=${JWT_SECRET:-change-this-to-a-long-random-secret}
       - DATA_DIR=/data
     restart: unless-stopped
 

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react'
 
-export default function PhotoUpload({ password, photos, onPhotosChange }) {
+export default function PhotoUpload({ token, photos, onPhotosChange }) {
   const [file, setFile] = useState(null)
   const [preview, setPreview] = useState(null)
   const [caption, setCaption] = useState('')
@@ -25,7 +25,7 @@ export default function PhotoUpload({ password, photos, onPhotosChange }) {
     try {
       const r = await fetch('/api/photos', {
         method: 'POST',
-        headers: { 'x-password': password },
+        headers: { Authorization: `Bearer ${token}` },
         body: formData
       })
       if (!r.ok) throw new Error('Upload failed')
@@ -43,7 +43,7 @@ export default function PhotoUpload({ password, photos, onPhotosChange }) {
     try {
       await fetch(`/api/photos/${id}`, {
         method: 'DELETE',
-        headers: { 'x-password': password }
+        headers: { Authorization: `Bearer ${token}` }
       })
     } catch (e) {
       alert('Fehler beim Löschen')

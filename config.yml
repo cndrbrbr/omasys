@@ -9,6 +9,12 @@ port: 3000
 # Passwort für das PostGUI (Familie)
 password: changeme
 
+# PIN für das OmaGUI (nur Ziffern, z.B. 4-stellig)
+oma_pin: 1234
+
+# Geheimer Schlüssel für JWT-Token (bitte ändern!)
+jwt_secret: change-this-to-a-long-random-secret
+
 # Caddy HTTPS-Proxy aktivieren? (true/false)
 # Kann auch per Kommandozeile überschrieben werden:
 #   ./start.sh --caddy      (erzwingt Caddy)

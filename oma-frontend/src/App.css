@@ -76,6 +76,102 @@ body {
   color: var(--text-muted);
 }
 
+/* PIN Login Screen */
+.pin-screen {
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pin-box {
+  text-align: center;
+  padding: 48px;
+}
+
+.pin-logo { font-size: 5rem; margin-bottom: 16px; }
+
+.pin-title {
+  font-size: 2.8rem;
+  font-weight: bold;
+  color: var(--accent2);
+  margin-bottom: 8px;
+}
+
+.pin-subtitle {
+  font-size: 1.4rem;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+}
+
+.pin-dots {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.pin-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 3px solid var(--text-muted);
+  background: transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.pin-dot.filled {
+  background: var(--accent2);
+  border-color: var(--accent2);
+}
+
+.pin-error {
+  color: var(--accent);
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  min-height: 1.4rem;
+}
+
+.pin-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.pin-key {
+  padding: 22px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  background: var(--bg2);
+  color: var(--text);
+  border: 2px solid var(--bg3);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background 0.1s, transform 0.1s;
+  user-select: none;
+}
+
+.pin-key:hover:not(:disabled) {
+  background: var(--bg3);
+}
+
+.pin-key:active:not(:disabled) {
+  transform: scale(0.93);
+  background: var(--accent2);
+  color: #1a1a2e;
+}
+
+.pin-key-empty {
+  background: transparent;
+  border-color: transparent;
+  cursor: default;
+  pointer-events: none;
+}
+
 /* Morning greeting overlay */
 .morning-overlay {
   position: fixed;

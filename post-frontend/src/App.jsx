@@ -5,10 +5,18 @@ import MessageInput from './components/MessageInput'
 import MessageHistory from './components/MessageHistory'
 import VideoCall from './components/VideoCall'
 
-const socket = io()
+let socket = null
 
 export default function App() {
-  const [password, setPassword] = useState(() => localStorage.getItem('omasys_pw') || '')
+  const [password, setPassword] = useState('')
+  const [token, setToken] = useState(() => {
+    const t = localStorage.getItem('omasys_post_token')
+    if (!t) return null
+    try {
+      const p = JSON.parse(atob(t.split('.')[1]))
+      return p.exp * 1000 > Date.now() ? t : null
+    } catch { return null }
+  })
   const [authed, setAuthed] = useState(false)
   const [authError, setAuthError] = useState('')
   const [messages, setMessages] = useState([])
@@ -24,12 +32,14 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
       })
+      const data = await r.json()
       if (r.ok) {
-        localStorage.setItem('omasys_pw', password)
+        localStorage.setItem('omasys_post_token', data.token)
+        setToken(data.token)
         setAuthed(true)
         setAuthError('')
       } else {
-        setAuthError('Falsches Passwort')
+        setAuthError(data.error || 'Falsches Passwort')
       }
     } catch (e) {
       setAuthError('Verbindungsfehler')
@@ -37,15 +47,24 @@ export default function App() {
   }
 
   useEffect(() => {
-    if (!authed) {
-      // Try saved password
-      if (password) login()
-      return
-    }
+    if (token && !authed) setAuthed(true)
+  }, [token])
 
-    fetch('/api/messages').then(r => r.json()).then(setMessages)
-    fetch('/api/reactions').then(r => r.json()).then(setReactions)
-    fetch('/api/photos').then(r => r.json()).then(setPhotos)
+  useEffect(() => {
+    if (!authed || !token) return
+
+    const h = { Authorization: `Bearer ${token}` }
+    fetch('/api/messages', { headers: h }).then(r => r.json()).then(setMessages)
+    fetch('/api/reactions', { headers: h }).then(r => r.json()).then(setReactions)
+    fetch('/api/photos', { headers: h }).then(r => r.json()).then(setPhotos)
+
+    socket = io({ auth: { token } })
+
+    socket.on('connect_error', () => {
+      localStorage.removeItem('omasys_post_token')
+      setToken(null)
+      setAuthed(false)
+    })
 
     socket.on('new_message', msg => setMessages(prev => [...prev, msg]))
     socket.on('new_reaction', r => setReactions(prev => [r, ...prev]))
@@ -54,16 +73,16 @@ export default function App() {
     socket.on('call_accepted', () => setCallActive(true))
     socket.on('call_ended', () => setCallActive(false))
 
-    return () => socket.off()
-  }, [authed])
+    return () => { if (socket) { socket.disconnect(); socket = null } }
+  }, [authed, token])
 
   const startCall = () => {
-    socket.emit('call_request', { from: 'Familie' })
+    socket?.emit('call_request', { from: 'Familie' })
     setCallActive(true)
   }
 
   const endCall = () => {
-    socket.emit('call_ended')
+    socket?.emit('call_ended')
     setCallActive(false)
   }
 
@@ -107,11 +126,11 @@ export default function App() {
 
       <main className="post-main">
         <div className="post-col post-col-left">
-          <PhotoUpload password={password} photos={photos} onPhotosChange={setPhotos} />
+          <PhotoUpload token={token} photos={photos} onPhotosChange={setPhotos} />
         </div>
 
         <div className="post-col post-col-right">
-          <MessageInput password={password} />
+          <MessageInput token={token} />
           <MessageHistory messages={messages} />
 
           {reactions.length > 0 && (

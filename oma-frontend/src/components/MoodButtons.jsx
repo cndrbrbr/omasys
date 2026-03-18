@@ -7,14 +7,14 @@ const MOODS = [
   { label: '😔 Nicht gut', value: 'Nicht gut', color: '#c0392b' },
 ]
 
-export default function MoodButtons({ socket }) {
+export default function MoodButtons({ token }) {
   const [sent, setSent] = useState('')
 
   const sendMood = async (mood) => {
     try {
       await fetch('/api/reactions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ reaction: mood.value })
       })
       setSent(`Gesendet: ${mood.value}`)

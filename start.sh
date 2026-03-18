@@ -20,6 +20,10 @@ PORT=$(get_config port)
 PORT=${PORT:-3000}
 PASSWORD=$(get_config password)
 PASSWORD=${PASSWORD:-changeme}
+OMA_PIN=$(get_config oma_pin)
+OMA_PIN=${OMA_PIN:-1234}
+JWT_SECRET=$(get_config jwt_secret)
+JWT_SECRET=${JWT_SECRET:-change-this-to-a-long-random-secret}
 USE_CADDY=$(get_config caddy)
 USE_CADDY=${USE_CADDY:-false}
 
@@ -38,7 +42,7 @@ if [ ${#COMPOSE_ARGS[@]} -eq 0 ]; then
     COMPOSE_ARGS=(up -d)
 fi
 
-export DOMAIN PORT POST_PASSWORD="$PASSWORD"
+export DOMAIN PORT POST_PASSWORD="$PASSWORD" OMA_PIN JWT_SECRET
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  OmaSys"
