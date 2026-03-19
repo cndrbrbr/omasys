@@ -28,18 +28,24 @@ USE_CADDY=$(get_config caddy)
 USE_CADDY=${USE_CADDY:-false}
 
 # Parse command line flags
-COMPOSE_ARGS=()
+BUILD=false
+COMPOSE_CMD=()
 for arg in "$@"; do
     case "$arg" in
         --caddy)    USE_CADDY=true  ;;
         --no-caddy) USE_CADDY=false ;;
-        *)          COMPOSE_ARGS+=("$arg") ;;
+        --build)    BUILD=true ;;
+        down)       COMPOSE_CMD=(down) ;;
+        *)          COMPOSE_CMD+=("$arg") ;;
     esac
 done
 
-# Default compose command if none given
-if [ ${#COMPOSE_ARGS[@]} -eq 0 ]; then
-    COMPOSE_ARGS=(up -d)
+# Default command: up -d [--build]
+if [ ${#COMPOSE_CMD[@]} -eq 0 ]; then
+    COMPOSE_CMD=(up -d)
+fi
+if [ "$BUILD" = "true" ]; then
+    COMPOSE_CMD+=(--build)
 fi
 
 export DOMAIN PORT POST_PASSWORD="$PASSWORD" OMA_PIN JWT_SECRET
@@ -56,11 +62,11 @@ if [ "$USE_CADDY" = "true" ]; then
     echo "  OmaGUI : https://$DOMAIN/"
     echo "  PostGUI: https://$DOMAIN/post"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    docker compose --profile caddy "${COMPOSE_ARGS[@]}"
+    docker compose --profile caddy "${COMPOSE_CMD[@]}"
 else
     echo "  Starte ohne Caddy (direkter HTTP-Zugriff)"
     echo "  OmaGUI : http://$DOMAIN:$PORT/"
     echo "  PostGUI: http://$DOMAIN:$PORT/post"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    docker compose "${COMPOSE_ARGS[@]}"
+    docker compose "${COMPOSE_CMD[@]}"
 fi
