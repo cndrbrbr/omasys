@@ -1,5 +1,7 @@
 # OmaSys
 
+<img src="omasys2.png" width="300" alt="OmaSys Screenshot" />
+
 A self-hosted family communication system designed for elderly relatives. Send photos and messages, make video calls, and greet Oma Sigrid every morning — all in real time.
 
 ## System Overview
