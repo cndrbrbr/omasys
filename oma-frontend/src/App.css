@@ -12,6 +12,11 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
   background: var(--bg);
@@ -25,6 +30,14 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.oma-layout {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .top-bar {
@@ -404,12 +417,13 @@ body {
 
 .chat-input {
   flex: 1;
-  background: var(--bg);
-  border: 1px solid var(--bg3);
-  color: var(--text);
-  padding: 10px 14px;
+  background: #ffffff;
+  border: 2px solid var(--bg3);
+  color: #000000;
+  padding: 14px 16px;
   border-radius: 8px;
-  font-size: 1.1rem;
+  font-size: 18px;
+  min-height: 64px;
 }
 
 .chat-send-btn {
