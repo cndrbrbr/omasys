@@ -35,6 +35,27 @@ A self-hosted family communication system designed for elderly relatives. Send p
 
 ---
 
+## Use case: Party & Celebration Slideshow
+
+OmaSys works great as a **shared photo and video show for parties, birthdays, weddings, or any family gathering**. Set up one laptop or TV as the display (OmaGUI in fullscreen), and let guests upload photos and videos from their phones via PostGUI — they appear in the slideshow within seconds.
+
+**How to set it up for an event:**
+
+1. Start OmaSys on any computer in the local network (no domain or HTTPS needed for local use)
+2. Put the OmaGUI (`http://<server-ip>:3000/`) in fullscreen on the display device — use `F11` in the browser, or connect a laptop/mini PC to the TV
+3. Share the PostGUI address (`http://<server-ip>:3000/post`) and the upload password with guests — e.g. as a QR code
+4. Guests open PostGUI on their phones and upload photos or short videos directly from the camera roll
+5. Every upload appears in the slideshow immediately — photos cycle every 8 seconds, videos play in full before advancing
+6. Use the **▶ sidebar toggle** (top-right in OmaGUI) to hide the chat panel and show only the slideshow in full width
+
+**Tips:**
+- Set a simple password in `config.yml` that guests can type easily
+- The 200 MB per-file limit covers most phone videos; up to 5 files can be uploaded at once
+- The slideshow loops continuously — no interaction needed on the display device
+- After the event, all photos and videos remain stored and can be browsed or deleted via PostGUI
+
+---
+
 ## Requirements
 
 - Docker + Docker Compose
