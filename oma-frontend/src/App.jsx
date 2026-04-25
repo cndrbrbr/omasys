@@ -112,6 +112,7 @@ export default function App() {
   const [morningGreeting, setMorningGreeting] = useState(null)
   const [callActive, setCallActive] = useState(false)
   const [incomingCall, setIncomingCall] = useState(false)
+  const [sidebarVisible, setSidebarVisible] = useState(true)
 
   const logout = useCallback(() => {
     clearToken()
@@ -181,15 +182,20 @@ export default function App() {
       <div className="oma-layout">
         <div className="top-bar">
           <Clock />
+          <button className="sidebar-toggle" onClick={() => setSidebarVisible(v => !v)}>
+            {sidebarVisible ? '▶' : '◀'}
+          </button>
         </div>
-        <div className="main-area">
+        <div className={`main-area${sidebarVisible ? '' : ' sidebar-hidden'}`}>
           <div className="photo-area">
             <PhotoDisplay photos={photos} />
           </div>
-          <div className="sidebar">
-            <Chat messages={messages} token={token} />
-            <MoodButtons token={token} />
-          </div>
+          {sidebarVisible && (
+            <div className="sidebar">
+              <Chat messages={messages} token={token} />
+              <MoodButtons token={token} />
+            </div>
+          )}
         </div>
       </div>
     </div>

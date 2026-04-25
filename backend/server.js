@@ -74,16 +74,17 @@ const storage = multer.diskStorage({
 })
 const upload = multer({
   storage,
-  limits: { fileSize: 30 * 1024 * 1024 },
+  limits: { fileSize: 200 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) cb(null, true)
-    else cb(new Error('Only images allowed'))
+    if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) cb(null, true)
+    else cb(new Error('Only images and videos allowed'))
   }
 })
 
 // Security headers (relax CSP for Jitsi iframe)
 app.use(helmet({
   contentSecurityPolicy: {
+    useDefaults: false,
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'"],
@@ -165,7 +166,7 @@ app.get('/api/photos', requireAny, (req, res) => {
 })
 
 app.post('/api/photos', requireFamily, uploadLimiter, upload.single('photo'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'Kein Bild' })
+  if (!req.file) return res.status(400).json({ error: 'Keine Datei' })
   const caption = req.body.caption || ''
   const photo = db.prepare('INSERT INTO photos (filename, caption) VALUES (?, ?) RETURNING *')
     .get(req.file.filename, caption)
