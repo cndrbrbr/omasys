@@ -68,5 +68,10 @@ else
     echo "  OmaGUI : http://$DOMAIN:$PORT/"
     echo "  PostGUI: http://$DOMAIN:$PORT/post"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    docker compose "${COMPOSE_CMD[@]}"
+    # Always include caddy profile on down to avoid orphaned containers
+    if [ "${COMPOSE_CMD[0]}" = "down" ]; then
+        docker compose --profile caddy "${COMPOSE_CMD[@]}"
+    else
+        docker compose "${COMPOSE_CMD[@]}"
+    fi
 fi
